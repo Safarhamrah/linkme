@@ -1,0 +1,6 @@
+import type { AnalyticsEvent, LinkItem } from "./types";
+export function isScheduledLinkVisible(link: LinkItem, now = new Date()): boolean { const scheduled = (link as LinkItem & { scheduledAt?: string; expiresAt?: string }); return link.enabled && (!scheduled.scheduledAt || new Date(scheduled.scheduledAt) <= now) && (!scheduled.expiresAt || new Date(scheduled.expiresAt) > now); }
+export function destinationForDevice(link: LinkItem & { iphoneUrl?: string; androidUrl?: string }, device: "iphone"|"android"|"desktop"): string { return device === "iphone" ? link.iphoneUrl || link.url : device === "android" ? link.androidUrl || link.url : link.url; }
+export function calculateCtr(events: AnalyticsEvent[]): number { const views=events.reduce((n,x)=>n+x.views,0); const clicks=events.reduce((n,x)=>n+x.clicks,0); return views ? Number(((clicks/views)*100).toFixed(1)) : 0; }
+export function analyticsCsv(events: AnalyticsEvent[]): string { return `date,views,clicks\n${events.map(x=>`${x.date},${x.views},${x.clicks}`).join("\n")}`; }
+export function moveLink(items: LinkItem[], from: number, to: number): LinkItem[] { const next=[...items]; const [item]=next.splice(from,1); next.splice(to,0,item); return next; }
